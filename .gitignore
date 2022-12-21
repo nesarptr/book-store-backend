@@ -3,6 +3,7 @@
 !.yarn/releases
 !.yarn/plugins
 .pnp.*
+.editorconfig
 
 # Logs
 logs
