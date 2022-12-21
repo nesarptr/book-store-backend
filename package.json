@@ -1,0 +1,23 @@
+{
+  "name": "inventory-management-system-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "nodemon": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nesarptr/inventory-management-system-backend.git"
+  },
+  "author": "Nesar Ahmad Patwary",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nesarptr/inventory-management-system-backend/issues"
+  },
+  "homepage": "https://github.com/nesarptr/inventory-management-system-backend#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
