@@ -8,8 +8,10 @@ router.get("/product/:id", shopController.getSingleProduct);
 
 router.post("/product/:id", shopController.addToCart);
 
-router.delete("/product/:id", shopController.removeFromCart);
+router.put("/product/:id", shopController.removeFromCart);
 
-router.delete("/products", shopController.removeWholeCart);
+router.delete("/products", shopController.clearCart);
 
 router.post("/order", shopController.addOrder);
+
+module.exports = router;

@@ -4,7 +4,6 @@ const productSchema = new Schema({
   name: {
     type: String,
     required: true,
-    lowercase: true,
     trim: true,
   },
   price: {
@@ -22,6 +21,7 @@ const productSchema = new Schema({
   owner: {
     type: Schema.Types.ObjectId,
     ref: "User",
+    required: true,
   },
 });
 
