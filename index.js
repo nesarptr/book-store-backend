@@ -1,4 +1,5 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const helmet = require("helmet");
 
 const app = express();
@@ -13,4 +14,13 @@ app.use("/", (_, res) => {
   });
 });
 
-app.listen(PORT);
+mongoose
+  .connect(
+    `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.smk9kza.mongodb.net/${process.env.MONGO_DATABASE}?retryWrites=true&w=majority`
+  )
+  .then(() => {
+    app.listen(PORT);
+  })
+  .catch((e) => {
+    console.log(e);
+  });
