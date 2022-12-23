@@ -6,11 +6,9 @@ router.get("/products", shopController.getAllProducts);
 
 router.get("/product/:id", shopController.getSingleProduct);
 
-router.post("/product/:id", shopController.addToCart);
+router.put("/product/:id", shopController.addToCart);
 
-router.put("/product/:id", shopController.removeFromCart);
-
-router.delete("/products", shopController.clearCart);
+router.delete("/product/:id", shopController.removeFromCart);
 
 router.post("/order", shopController.addOrder);
 

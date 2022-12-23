@@ -24,7 +24,7 @@ app.use((_, res, next) => {
 app.use(helmet());
 
 app.use("/api/v1/admin", adminRoutes);
-app.use("api/v1/shop", shopRoutes);
+app.use("/api/v1/shop", shopRoutes);
 
 app.use("/", (_, res) => {
   res.status(200).json({

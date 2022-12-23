@@ -1,26 +1,31 @@
 const User = require("../models/user");
 const Product = require("../models/product");
+const { checkAuthorizedAndNotEmpty } = require("../utils/auth-non-empty-check");
+const { extractProductBody } = require("../utils/extraction");
 
-exports.addNewProduct = async (req, res, next) => {
-  const userId = req.body.userId;
-  const name = req.body.name;
-  const price = req.body.price;
-  const imgURL = req.body.imgURL;
-  const description = req.body.description;
-
-  const product = new Product({
-    owner: userId,
-    name,
-    description,
-    price,
-    imgURL,
-  });
-
-  await product.save();
-
+exports.addNewProduct = async (req, res, _) => {
+  const prods = req.body.products;
+  let message;
+  let data;
+  if (!prods) {
+    const product = new Product(extractProductBody(req.body));
+    await product.save();
+    message = "successfully product is created";
+    data = product;
+  } else {
+    const products = [];
+    const productData = prods.map((p) =>
+      new Product(extractProductBody(p)).save()
+    );
+    for await (const prod of productData) {
+      products.push(prod);
+    }
+    message = "successfully products are created";
+    data = products;
+  }
   res.status(201).json({
-    message: "successfully product is created",
-    product,
+    message,
+    data,
   });
 };
 
@@ -59,7 +64,7 @@ exports.editProduct = async (req, res, _) => {
   res.status(200).json(product);
 };
 
-exports.deleteProduct = async (req, res, next) => {
+exports.deleteProduct = async (req, res, _) => {
   const prodId = req.params.id;
   const userId = req.body.userId;
   const product = await Product.findById(prodId);
@@ -73,16 +78,3 @@ exports.deleteProduct = async (req, res, next) => {
     deleteData,
   });
 };
-
-function checkAuthorizedAndNotEmpty(product, id) {
-  if (!product) {
-    const error = new Error("Could not find product.");
-    error.statusCode = 404;
-    throw error;
-  }
-  if (product.owner.toString() !== id) {
-    const error = new Error("Not authorized!");
-    error.statusCode = 403;
-    throw error;
-  }
-}
