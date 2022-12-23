@@ -70,7 +70,7 @@ exports.deleteProduct = async (req, res, _) => {
   const product = await Product.findById(prodId);
   checkAuthorizedAndNotEmpty(product, userId);
   const user = await User.findById(userId);
-  const deleteData = await product.delete();
+  const deleteData = await product.remove();
   user.products = user.products.filter((p) => p._id !== deleteData._id);
   await user.save();
   res.status(200).json({

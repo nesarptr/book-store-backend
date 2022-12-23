@@ -16,6 +16,12 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  varified: {
+    type: Boolean,
+    default: false,
+    required: true,
+  },
+  refreshTokens: [String],
   products: [
     {
       type: Schema.Types.ObjectId,

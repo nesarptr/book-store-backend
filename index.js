@@ -10,6 +10,7 @@ const adminRoutes = require("./routes/admin");
 const PORT = process.env.PORT || 8080;
 const app = express();
 
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 app.use((_, res, next) => {
