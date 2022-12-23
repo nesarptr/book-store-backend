@@ -1069,7 +1069,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"body-parser@npm:1.20.1, body-parser@npm:^1.20.1":
+"body-parser@npm:1.20.1":
   version: 1.20.1
   resolution: "body-parser@npm:1.20.1"
   dependencies:
@@ -1811,7 +1811,6 @@ __metadata:
   resolution: "inventory-management-system-backend@workspace:."
   dependencies:
     bcryptjs: ^2.4.3
-    body-parser: ^1.20.1
     express: ^4.18.2
     express-validator: ^6.14.2
     helmet: ^6.0.1

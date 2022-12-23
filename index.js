@@ -1,6 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
+// const bodyParser = require("body-parser");
 const helmet = require("helmet");
 
 const authRoutes = require("./routes/auth");
@@ -10,7 +10,7 @@ const adminRoutes = require("./routes/admin");
 const PORT = process.env.PORT || 8080;
 const app = express();
 
-app.use(bodyParser.json());
+app.use(express.json());
 
 app.use((_, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
