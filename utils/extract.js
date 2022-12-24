@@ -1,5 +1,7 @@
 const crypto = require("crypto");
 
+const bcrypt = require("bcryptjs");
+
 exports.productBody = (body) => {
   const name = body.name;
   const price = body.price;

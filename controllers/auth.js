@@ -1,5 +1,4 @@
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 
 const { handleLoginJWT, handleRefreshToken } = require("../utils/auth");
 const send = require("../utils/send");
@@ -82,7 +81,7 @@ exports.login = async ({ body, cookies }, res, _) => {
   );
 
   user.refreshTokens = newTokens;
-  res.status(200).json({
+  res.status(201).json({
     message: "User Successfully Loged In",
     data: {
       userId: user._id,
@@ -111,7 +110,7 @@ exports.refresh = async ({ cookies }, res, _) => {
       await hackedUser.save();
     }
   );
-  res.status(200).json({
+  res.status(201).json({
     message: "token refreshed successfully",
     accessToken,
   });
