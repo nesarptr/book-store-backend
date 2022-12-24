@@ -1,7 +1,7 @@
 const User = require("../models/user");
 const Product = require("../models/product");
 const { checkAuthorizedAndNotEmpty } = require("../utils/auth-non-empty-check");
-const { extractProductBody } = require("../utils/extraction");
+const { productBody: extractProductBody } = require("../utils/extract");
 
 exports.addNewProduct = async (req, res, _) => {
   const prods = req.body.products;

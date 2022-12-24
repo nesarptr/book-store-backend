@@ -16,6 +16,8 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  varifyToken: String,
+  varifyTokenExpiration: Date,
   varified: {
     type: Boolean,
     default: false,
