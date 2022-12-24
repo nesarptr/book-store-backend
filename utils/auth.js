@@ -25,7 +25,7 @@ exports.handleLoginJWT = async (
     { expiresIn: expACToken }
   );
   const newRefreshToken = jwt.sign(
-    { userId: user._id },
+    { userId: userId },
     process.env.REFRESH_TOKEN_SECRET,
     { expiresIn: expRTToken }
   );
@@ -78,6 +78,7 @@ exports.handleRefreshToken = async (
   findByToken,
   handleHack
 ) => {
+  // console.log(cookies.jwt);
   if (!cookies?.jwt) Throw.AuthenticationError();
   const refreshToken = cookies.jwt;
   res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true });

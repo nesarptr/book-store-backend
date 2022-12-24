@@ -11,7 +11,7 @@ const sender = {
   name: "Manager",
 };
 
-exports.varificationMail = async (email, url = "") => {
+exports.varificationMail = async (email, url = "", varifyToken) => {
   const receivers = [
     {
       email,

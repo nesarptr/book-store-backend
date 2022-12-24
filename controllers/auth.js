@@ -12,9 +12,9 @@ exports.signup = async ({ body }, res, _) => {
   if (user) {
     Throw.BadRequestError("User Already exist");
   }
-  user = new User(extract.userBody(body));
+  user = new User(await extract.userBody(body));
   await user.save();
-  send.varificationMail(email, url);
+  send.varificationMail(user.email, url, user.varifyToken);
   res.status(201).json({
     message: "user successfully signed up! Please varify the email",
     userId: user._id,
@@ -61,7 +61,7 @@ exports.login = async ({ body, cookies }, res, _) => {
   }
   if (!user.varified) {
     if (url) {
-      send.varificationMail(email, url);
+      send.varificationMail(email, url, user.varifyToken);
     }
     Throw.AuthenticationError();
   }
@@ -71,8 +71,8 @@ exports.login = async ({ body, cookies }, res, _) => {
     user._id,
     user.email,
     user.refreshTokens,
-    60 * 1,
-    "0.5h",
+    60 * 10,
+    60 * 30,
     24 * 60 * 60 * 1000,
     res,
     async (rt) => {
@@ -81,6 +81,7 @@ exports.login = async ({ body, cookies }, res, _) => {
   );
 
   user.refreshTokens = newTokens;
+  await user.save();
   res.status(201).json({
     message: "User Successfully Loged In",
     data: {
@@ -90,30 +91,38 @@ exports.login = async ({ body, cookies }, res, _) => {
   });
 };
 
-exports.refresh = async ({ cookies }, res, _) => {
-  const accessToken = await handleRefreshToken(
-    cookies,
-    60 * 1,
-    "0.5h",
-    24 * 60 * 60 * 1000,
-    res,
-    async (token) => {
-      return await User.findOne({ refreshTokens: token });
-    },
-    async (err, decoded) => {
-      if (err) Throw.AuthorizationError();
-      //"attempted refresh token reuse!"
-      const hackedUser = await User.findOne({
-        _id: decoded.userId,
-      }).exec();
-      hackedUser.refreshTokens = [];
-      await hackedUser.save();
-    }
-  );
-  res.status(201).json({
-    message: "token refreshed successfully",
-    accessToken,
-  });
+exports.refresh = async ({ cookies }, res, next) => {
+  try {
+    const accessToken = await handleRefreshToken(
+      cookies,
+      60 * 10,
+      60 * 30,
+      24 * 60 * 60 * 1000,
+      res,
+      async (token) => {
+        return await User.findOne({ refreshTokens: token });
+      },
+      async (err, decoded) => {
+        if (err) {
+          const error = new Error("Not Authorized");
+          error.statusCode = 403;
+          return next(error);
+        }
+        //"attempted refresh token reuse!"
+        const hackedUser = await User.findOne({
+          _id: decoded.userId,
+        }).exec();
+        hackedUser.refreshTokens = [];
+        await hackedUser.save();
+      }
+    );
+    res.status(201).json({
+      message: "token refreshed successfully",
+      accessToken,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.logout = async ({ cookies }, res, _) => {

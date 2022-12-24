@@ -1,3 +1,5 @@
+const jwt = require("jsonwebtoken");
+
 const Throw = require("../utils/throw");
 
 module.exports = (req, res, next) => {
