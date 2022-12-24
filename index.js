@@ -7,6 +7,7 @@ const isAuthenticated = require("./middleware/is-auth");
 const authRoutes = require("./routes/auth");
 const shopRoutes = require("./routes/shop");
 const adminRoutes = require("./routes/admin");
+const Throw = require("./utils/throw");
 
 const PORT = process.env.PORT || 8080;
 const app = express();
@@ -33,9 +34,7 @@ app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/shop", shopRoutes);
 
 app.use("/", () => {
-  const err = new Error("404 Not Found");
-  err.statusCode = 404;
-  throw err;
+  Throw.NotFoundError();
 });
 
 app.use((error, _, res, __) => {

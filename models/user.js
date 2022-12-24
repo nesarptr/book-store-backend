@@ -1,5 +1,7 @@
 const { Schema, model } = require("mongoose");
 
+const Product = require("./product");
+
 const userSchema = new Schema({
   name: {
     type: String,
@@ -48,6 +50,12 @@ const userSchema = new Schema({
       min: 0,
     },
   },
+});
+
+userSchema.post("remove", async (user) => {
+  for (const product of user.products) {
+    await Product.remove({ _id: product });
+  }
 });
 
 module.exports = model("User", userSchema);

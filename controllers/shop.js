@@ -2,6 +2,7 @@ const Order = require("../models/order");
 const User = require("../models/user");
 const Product = require("../models/product");
 const { checkNotEmpty } = require("../utils/auth-non-empty-check");
+const Throw = require("../utils/throw");
 
 exports.getAllProducts = async (_, res, __) => {
   const products = (await Product.find()).map((p) => p);
@@ -11,8 +12,8 @@ exports.getAllProducts = async (_, res, __) => {
   });
 };
 
-exports.getSingleProduct = async (req, res, _) => {
-  const prodId = req.params.id;
+exports.getSingleProduct = async ({ params }, res, _) => {
+  const prodId = params.id;
   const product = await Product.findById(prodId);
   checkNotEmpty(product);
   res.status(200).json({
@@ -21,14 +22,12 @@ exports.getSingleProduct = async (req, res, _) => {
   });
 };
 
-exports.addToCart = async (req, res, _) => {
-  const productId = req.params.id;
-  const quantity = Number(req.body.quantity);
-  const userId = req.body.userId;
+exports.addToCart = async ({ body, params, userId }, res, _) => {
+  const productId = params.id;
+  const quantity = Number(body.quantity);
   const product = await Product.findById(productId);
   const user = await User.findById(userId);
   checkNotEmpty(product);
-  checkNotEmpty(user);
   const prodInd = user.cart.items.findIndex(
     (p) => p.productId.toString() === productId
   );
@@ -43,25 +42,31 @@ exports.addToCart = async (req, res, _) => {
   user.cart.totalPrice -= Number(product.price) * oldQty;
   user.cart.totalPrice += Number(product.price) * quantity;
   await user.save();
-  res.status(200).json({
+  res.status(201).json({
     message: "product successfully added to the cart",
     data: user.cart,
   });
 };
 
-exports.removeFromCart = async (req, res, _) => {
-  const prodId = req.params.id;
-  const userId = req.body.userId;
+exports.removeFromCart = async ({ params, body, userId }, res, _) => {
+  const quantity = body.quantity;
+  const prodId = params.id;
   const user = await User.findById(userId);
   const product = await Product.findById(prodId);
-  checkNotEmpty(user);
   checkNotEmpty(product);
   const prodInd = user.cart.items.findIndex(
     (p) => p.productId.toString() === prodId
   );
-  const quantity = user.cart.items[prodInd].quantity;
-  user.cart.items.splice(prodInd, 1);
-  user.cart.totalPrice -= product.price * quantity;
+  if (prodInd === -1) {
+    Throw.BadRequestError("Item was not found in the cart");
+  }
+  const oldQty = user.cart.items[prodInd].quantity;
+  if (!quantity || quantity <= 0 || oldQty - quantity <= 0) {
+    user.cart.items.splice(prodInd, 1);
+    user.cart.totalPrice -= product.price * oldQty;
+  } else {
+    user.cart.totalPrice -= product.price * quantity;
+  }
   await user.save();
   res.status(200).json({
     message: "successfully removed from cart",
@@ -69,13 +74,11 @@ exports.removeFromCart = async (req, res, _) => {
   });
 };
 
-exports.addOrder = async (req, res, _) => {
-  const userId = req.body.userId;
+exports.addOrder = async ({ userId }, res, _) => {
   const user = await User.findById(userId).populate("cart.items.productId");
   const products = user.cart.items.map((p) => {
     return { product: p.productId, quantity: p.quantity };
   });
-  checkNotEmpty(user);
   const order = new Order({
     products,
     price: user.cart.totalPrice,

@@ -1,14 +1,15 @@
+const Throw = require("../utils/throw");
 const User = require("../models/user");
 const Product = require("../models/product");
 const { checkAuthorizedAndNotEmpty } = require("../utils/auth-non-empty-check");
 const { productBody: extractProductBody } = require("../utils/extract");
 
-exports.addNewProduct = async (req, res, _) => {
-  const prods = req.body.products;
+exports.addNewProduct = async ({ body }, res, _) => {
+  const prods = body.products;
   let message;
   let data;
   if (!prods) {
-    const product = new Product(extractProductBody(req.body));
+    const product = new Product(extractProductBody(body));
     await product.save();
     message = "successfully product is created";
     data = product;
@@ -29,44 +30,46 @@ exports.addNewProduct = async (req, res, _) => {
   });
 };
 
-exports.getAllProducts = async (req, res, _) => {
-  const userId = req.body.userId;
+exports.getAllProducts = async ({ userId }, res, _) => {
   const products = (await Product.find({ owner: userId })).map(
     (product) => product
   );
+  if (!products) {
+    Throw.NotFoundError("Product Not Fount");
+  }
   res.status(200).json({
     message: "all data successfully retrived",
-    products,
+    data: products,
   });
 };
 
-exports.getProduct = async (req, res, _) => {
-  const prodId = req.params.id;
-  const userId = req.body.userId;
+exports.getProduct = async ({ params, userId }, res, _) => {
+  const prodId = params.id;
   const product = await Product.findById(prodId);
 
   checkAuthorizedAndNotEmpty(product, userId);
-  res.status(200).json(product);
+  res.status(200).json({
+    message: "product successfully retrived",
+    data: product,
+  });
 };
 
-exports.editProduct = async (req, res, _) => {
-  const prodId = req.params.id;
-  const userId = req.body.userId;
+exports.editProduct = async ({ params, body, userId }, res, _) => {
+  const prodId = params.id;
   const product = await Product.findById(prodId);
 
   checkAuthorizedAndNotEmpty(product, userId);
 
-  product.name = req.body.name || product.name;
-  product.price = req.body.price || product.price;
-  product.imgURL = req.body.imgURL || product.imgURL;
-  product.description = req.body.description || product.description;
+  product.name = body.name || product.name;
+  product.price = body.price || product.price;
+  product.imgURL = body.imgURL || product.imgURL;
+  product.description = body.description || product.description;
   await product.save();
   res.status(200).json(product);
 };
 
-exports.deleteProduct = async (req, res, _) => {
-  const prodId = req.params.id;
-  const userId = req.body.userId;
+exports.deleteProduct = async ({ params, userId }, res, _) => {
+  const prodId = params.id;
   const product = await Product.findById(prodId);
   checkAuthorizedAndNotEmpty(product, userId);
   const user = await User.findById(userId);
