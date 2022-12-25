@@ -29,9 +29,8 @@ app.use(cookieParser());
 
 app.use("/api/v1/auth", authRoutes);
 
-app.use(isAuthenticated);
-app.use("/api/v1/admin", adminRoutes);
-app.use("/api/v1/shop", shopRoutes);
+app.use("/api/v1/admin", isAuthenticated, adminRoutes);
+app.use("/api/v1/shop", isAuthenticated, shopRoutes);
 
 app.use("/", () => {
   Throw.NotFoundError();
