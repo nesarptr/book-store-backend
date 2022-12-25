@@ -99,6 +99,8 @@ exports.handleRefreshToken = async (
     // evaluate jwt
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 
+    if (!decoded || user._id.toString() !== decoded.userId.toString())
+      Throw.AuthorizationError();
     // Refresh token was still valid
     accessToken = jwt.sign(
       {
@@ -132,8 +134,6 @@ exports.handleRefreshToken = async (
       user.refreshTokens = [...newRefreshTokens];
       await user.save();
     }
-    if (user._id.toString() !== decoded.userId.toString())
-      Throw.AuthorizationError();
   }
 
   return accessToken;
