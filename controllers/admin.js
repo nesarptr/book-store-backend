@@ -51,7 +51,7 @@ exports.getAllProducts = async ({ userId }, res, next) => {
     const products = (await Product.find({ owner: userId })).map(
       (product) => product
     );
-    if (!products) {
+    if (!products || products.length === 0) {
       Throw.NotFoundError("Product Not Fount");
     }
     res.status(200).json({
