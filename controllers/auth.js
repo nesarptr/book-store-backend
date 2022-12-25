@@ -1,4 +1,5 @@
 const bcrypt = require("bcryptjs");
+const { validationResult } = require("express-validator");
 
 const { handleLoginJWT, handleRefreshToken } = require("../utils/auth");
 const send = require("../utils/send");
@@ -6,11 +7,18 @@ const Throw = require("../utils/throw");
 const extract = require("../utils/extract");
 const User = require("../models/user");
 
-exports.signup = async ({ body }, res, _) => {
-  const url = body.url || "";
+exports.signup = async (req, res, _) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    Throw.ValidationError(errors.array()[0].msg);
+  }
+  const body = req.body;
+  const url = body.url || req;
   let user = await User.findOne({ email: body.email });
   if (user) {
-    Throw.BadRequestError("User Already exist");
+    Throw.BadRequestError(
+      "E-Mail exists already, please pick a different one."
+    );
   }
   user = new User(await extract.userBody(body));
   await user.save();
@@ -32,7 +40,7 @@ exports.varifyMail = async ({ params }, res, _) => {
     ],
   });
   if (!user) {
-    Throw.AuthenticationError();
+    Throw.AuthenticationError("Invalid Token");
   }
   user.varified = true;
   user.varifyToken = "";
@@ -45,25 +53,28 @@ exports.varifyMail = async ({ params }, res, _) => {
   });
 };
 
-exports.login = async ({ body, cookies }, res, _) => {
+exports.login = async (req, res, _) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    Throw.ValidationError(errors.array()[0].msg);
+  }
+  const body = req.body;
+  const cookies = req.cookies;
   const url = body.url;
   const email = body.email;
-  if (!email || !body.password) {
-    Throw.BadRequestError();
-  }
   const user = await User.findOne({ email });
   if (!user) {
-    Throw.AuthenticationError();
+    Throw.AuthenticationError("Email or Password is incorrect");
   }
   const doMatch = await bcrypt.compare(body.password, user.password);
   if (!doMatch) {
-    Throw.AuthenticationError();
+    Throw.AuthenticationError("Email or Password is incorrect");
   }
   if (!user.varified) {
     if (url) {
       send.varificationMail(email, url, user.varifyToken);
     }
-    Throw.AuthenticationError();
+    Throw.AuthenticationError("User did not Verify his/her email");
   }
 
   const { newTokens, accessToken } = await handleLoginJWT(
@@ -91,7 +102,8 @@ exports.login = async ({ body, cookies }, res, _) => {
   });
 };
 
-exports.refresh = async ({ cookies }, res, next) => {
+exports.refresh = async (req, res, next) => {
+  const cookies = req.cookies;
   try {
     const accessToken = await handleRefreshToken(
       cookies,

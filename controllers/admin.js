@@ -1,3 +1,5 @@
+const { validationResult } = require("express-validator");
+
 const Throw = require("../utils/throw");
 const User = require("../models/user");
 const Product = require("../models/product");
@@ -5,7 +7,14 @@ const { checkAuthorizedAndNotEmpty } = require("../utils/auth-non-empty-check");
 const { productBody: extractProductBody } = require("../utils/extract");
 const send = require("../utils/send");
 
-exports.addNewProduct = async ({ body, email }, res, _) => {
+exports.addNewProduct = async (req, res, _) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    Throw.ValidationError(errors.array()[0].msg);
+  }
+  const email = req.email;
+  const body = req.body;
+  body.userId = req.userId;
   const prods = body.products;
   let message;
   let data;
@@ -57,16 +66,24 @@ exports.getProduct = async ({ params, userId }, res, _) => {
   });
 };
 
-exports.editProduct = async ({ params, body, userId }, res, _) => {
+exports.editProduct = async (req, res, _) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    Throw.ValidationError(errors.array()[0].msg);
+  }
+  const params = req.params;
+  const body = req.body;
+  const userId = req.userId;
+  body.userId = userId;
   const prodId = params.id;
   const product = await Product.findById(prodId);
 
   checkAuthorizedAndNotEmpty(product, userId);
 
-  product.name = body.name || product.name;
-  product.price = body.price || product.price;
+  product.name = body.name;
+  product.price = body.price;
   product.imgURL = body.imgURL || product.imgURL;
-  product.description = body.description || product.description;
+  product.description = body.description;
   await product.save();
   res.status(200).json(product);
 };

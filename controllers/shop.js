@@ -26,6 +26,9 @@ exports.getSingleProduct = async ({ params }, res, _) => {
 exports.addToCart = async ({ body, params, userId }, res, _) => {
   const productId = params.id;
   const quantity = Number(body.quantity);
+  if (quantity <= 0) {
+    Throw.ValidationError("Product Quantity has to be greater than zero");
+  }
   const product = await Product.findById(productId);
   const user = await User.findById(userId);
   checkNotEmpty(product);
@@ -77,9 +80,9 @@ exports.removeFromCart = async ({ params, body, userId }, res, _) => {
 
 exports.addOrder = async ({ userId }, res, _) => {
   const user = await User.findById(userId).populate("cart.items.productId");
-  // if (user.cart.items.length === 0 || user.cart.totalPrice <= 0) {
-  //   Throw.BadRequestError("User cart is empty");
-  // }
+  if (user.cart.items.length === 0 || user.cart.totalPrice <= 0) {
+    Throw.BadRequestError("User cart is empty");
+  }
   const products = user.cart.items.map((p) => {
     return { product: p.productId, quantity: p.quantity };
   });
