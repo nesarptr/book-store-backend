@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 
 const Throw = require("../utils/throw");
 
-module.exports = (req, res, next) => {
+module.exports = (req, _, next) => {
   const authHeader = req.headers.authorization || req.headers.Authorization;
   if (!authHeader?.startsWith("Bearer ")) Throw.AuthenticationError();
   const token = authHeader.split(" ")[1];

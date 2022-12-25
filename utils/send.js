@@ -46,3 +46,35 @@ exports.confirmationMail = async (email) => {
           `,
   });
 };
+
+exports.productCreatedConfirmationMail = async (email, prodId) => {
+  const receivers = [
+    {
+      email,
+    },
+  ];
+  await tranEmailApi.sendTransacEmail({
+    sender,
+    to: receivers,
+    subject: "Product Successfully Created",
+    htmlContent: `
+            <h2>Your Product with ID ${prodId} has successfully created</h2>
+          `,
+  });
+};
+
+exports.orderPlacedConfirmationMail = async (email, orderId) => {
+  const receivers = [
+    {
+      email,
+    },
+  ];
+  await tranEmailApi.sendTransacEmail({
+    sender,
+    to: receivers,
+    subject: "Order Successfully Palced",
+    htmlContent: `
+            <h2>Your Order with ID ${orderId} has successfully placed</h2>
+          `,
+  });
+};

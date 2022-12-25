@@ -3,8 +3,9 @@ const User = require("../models/user");
 const Product = require("../models/product");
 const { checkAuthorizedAndNotEmpty } = require("../utils/auth-non-empty-check");
 const { productBody: extractProductBody } = require("../utils/extract");
+const send = require("../utils/send");
 
-exports.addNewProduct = async ({ body }, res, _) => {
+exports.addNewProduct = async ({ body, email }, res, _) => {
   const prods = body.products;
   let message;
   let data;
@@ -13,12 +14,14 @@ exports.addNewProduct = async ({ body }, res, _) => {
     await product.save();
     message = "successfully product is created";
     data = product;
+    send.productCreatedConfirmationMail(email, product._id.toString());
   } else {
     const products = [];
     const productData = prods.map((p) =>
       new Product(extractProductBody(p)).save()
     );
     for await (const prod of productData) {
+      send.productCreatedConfirmationMail(email, prod._id.toString());
       products.push(prod);
     }
     message = "successfully products are created";

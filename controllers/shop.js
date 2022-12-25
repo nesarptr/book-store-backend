@@ -3,6 +3,7 @@ const User = require("../models/user");
 const Product = require("../models/product");
 const { checkNotEmpty } = require("../utils/auth-non-empty-check");
 const Throw = require("../utils/throw");
+const send = require("../utils/send");
 
 exports.getAllProducts = async (_, res, __) => {
   const products = (await Product.find()).map((p) => p);
@@ -76,6 +77,9 @@ exports.removeFromCart = async ({ params, body, userId }, res, _) => {
 
 exports.addOrder = async ({ userId }, res, _) => {
   const user = await User.findById(userId).populate("cart.items.productId");
+  // if (user.cart.items.length === 0 || user.cart.totalPrice <= 0) {
+  //   Throw.BadRequestError("User cart is empty");
+  // }
   const products = user.cart.items.map((p) => {
     return { product: p.productId, quantity: p.quantity };
   });
@@ -88,6 +92,7 @@ exports.addOrder = async ({ userId }, res, _) => {
     },
   });
   await order.save();
+  send.orderPlacedConfirmationMail(user.email, order._id.toString());
   res.status(200).json({
     message: "order has been successfully placed",
     data: order,
