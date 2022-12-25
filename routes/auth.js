@@ -12,7 +12,7 @@ router.post(
       .notEmpty(),
     body("email", "invalid email")
       .trim()
-      .isEmpty()
+      .notEmpty()
       .isString()
       .isEmail()
       .normalizeEmail(),
@@ -30,7 +30,7 @@ router.post(
   [
     body("email", "invalid email")
       .trim()
-      .isEmpty()
+      .notEmpty()
       .isString()
       .isEmail()
       .normalizeEmail(),
