@@ -82,8 +82,8 @@ exports.login = async (req, res, _) => {
     user._id,
     user.email,
     user.refreshTokens,
-    60 * 10,
-    60 * 30,
+    60 * 15,
+    60 * 60,
     24 * 60 * 60 * 1000,
     res,
     async (rt) => {
@@ -107,8 +107,8 @@ exports.refresh = async (req, res, next) => {
   try {
     const accessToken = await handleRefreshToken(
       cookies,
-      60 * 10,
-      60 * 30,
+      60 * 15,
+      60 * 60,
       24 * 60 * 60 * 1000,
       res,
       async (token) => {
