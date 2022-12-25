@@ -33,8 +33,6 @@ router.post(
 
 router.get("/products", adminController.getAllProducts);
 
-router.get("/product/:id", adminController.getProduct);
-
 router.put(
   "/product/:id",
   body(

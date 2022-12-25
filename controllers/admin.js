@@ -55,17 +55,6 @@ exports.getAllProducts = async ({ userId }, res, _) => {
   });
 };
 
-exports.getProduct = async ({ params, userId }, res, _) => {
-  const prodId = params.id;
-  const product = await Product.findById(prodId);
-
-  checkAuthorizedAndNotEmpty(product, userId);
-  res.status(200).json({
-    message: "product successfully retrived",
-    data: product,
-  });
-};
-
 exports.editProduct = async (req, res, _) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
