@@ -58,7 +58,7 @@ exports.handleLoginJWT = async (
 
   res.cookie("jwt", newRefreshToken, {
     httpOnly: true,
-    secure: true,
+    secure: false,
     sameSite: "None",
     maxAge: cookieAge,
   });
@@ -99,14 +99,15 @@ exports.handleRefreshToken = async (
     // evaluate jwt
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 
-    if (!decoded || user._id.toString() !== decoded.UserInfo.userId.toString())
+    if (!decoded || user._id.toString() !== decoded.userId.toString()) {
       Throw.AuthorizationError();
+    }
     // Refresh token was still valid
     accessToken = jwt.sign(
       {
         UserInfo: {
-          userId: decoded.UserInfo.userId,
-          email: decoded.UserInfo.email,
+          userId: user._id.toString(),
+          email: user.email,
         },
       },
       process.env.ACCESS_TOKEN_SECRET,
