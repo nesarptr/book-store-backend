@@ -95,7 +95,6 @@ exports.editProduct = async (req, res, next) => {
 
 exports.deleteProduct = async ({ params, userId, email }, res, next) => {
   try {
-    const email = email;
     const prodId = params.id;
     const product = await Product.findById(prodId);
     checkAuthorizedAndNotEmpty(product, userId);

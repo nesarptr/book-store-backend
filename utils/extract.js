@@ -8,7 +8,6 @@ exports.productBody = (body) => {
   const description = body.description;
   const imgURL = body.imgURL;
   const owner = body.userId;
-  // console.log(body);
   return {
     name,
     price,

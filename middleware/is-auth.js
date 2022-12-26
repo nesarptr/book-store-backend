@@ -9,8 +9,8 @@ module.exports = (req, _, next) => {
   try {
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     // console.log(req.userId, decoded.userId);
-    req.userId = decoded.userId;
-    req.email = decoded.email;
+    req.userId = decoded.UserInfo.userId;
+    req.email = decoded.UserInfo.email;
     next();
   } catch {
     Throw.AuthorizationError("invalid token"); //invalid token
