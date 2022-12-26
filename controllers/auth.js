@@ -132,7 +132,7 @@ exports.refresh = async (req, res, next) => {
         }
         //"attempted refresh token reuse!"
         const hackedUser = await User.findOne({
-          _id: decoded.userId,
+          _id: decoded.UserInfo.userId,
         }).exec();
         hackedUser.refreshTokens = [];
         await hackedUser.save();

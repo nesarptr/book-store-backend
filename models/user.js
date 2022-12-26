@@ -53,9 +53,7 @@ const userSchema = new Schema({
 });
 
 userSchema.post("remove", async (user) => {
-  for (const product of user.products) {
-    await Product.remove({ _id: product });
-  }
+  await Product.deleteMany({ _id: { $in: user.products } });
 });
 
 module.exports = model("User", userSchema);

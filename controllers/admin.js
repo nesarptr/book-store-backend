@@ -17,6 +17,7 @@ exports.addNewProduct = async (req, res, next) => {
     const body = req.body;
     body.userId = req.userId;
     const prods = body.products;
+    const user = await User.findById(body.userId);
     let message;
     let data;
     if (!prods) {
@@ -24,6 +25,7 @@ exports.addNewProduct = async (req, res, next) => {
       await product.save();
       message = "successfully product is created";
       data = product;
+      user.products.push(product._id);
       send.productCreatedConfirmationMail(email, product._id.toString());
     } else {
       const products = [];
@@ -31,12 +33,14 @@ exports.addNewProduct = async (req, res, next) => {
         new Product(extractProductBody(p)).save()
       );
       for await (const prod of productData) {
+        user.products.push(prod._id);
         send.productCreatedConfirmationMail(email, prod._id.toString());
         products.push(prod);
       }
       message = "successfully products are created";
       data = products;
     }
+    await user.save();
     res.status(201).json({
       message,
       data,
@@ -89,18 +93,20 @@ exports.editProduct = async (req, res, next) => {
   }
 };
 
-exports.deleteProduct = async ({ params, userId }, res, next) => {
+exports.deleteProduct = async ({ params, userId, email }, res, next) => {
   try {
+    const email = email;
     const prodId = params.id;
     const product = await Product.findById(prodId);
     checkAuthorizedAndNotEmpty(product, userId);
     const user = await User.findById(userId);
-    const deleteData = await product.remove();
-    user.products = user.products.filter((p) => p._id !== deleteData._id);
+    const deleteProduct = await product.remove();
+    user.products = user.products.filter((p) => !p.equals(deleteProduct._id));
     await user.save();
+    send.productDeletedConfirmationMail(email, deleteProduct._id);
     res.status(200).json({
       message: "Delete Operation Successfull",
-      deleteData,
+      deleteData: deleteProduct,
     });
   } catch (error) {
     next(error);

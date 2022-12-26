@@ -63,6 +63,22 @@ exports.productCreatedConfirmationMail = async (email, prodId) => {
   });
 };
 
+exports.productDeletedConfirmationMail = async (email, prodId) => {
+  const receivers = [
+    {
+      email,
+    },
+  ];
+  await tranEmailApi.sendTransacEmail({
+    sender,
+    to: receivers,
+    subject: "Product Successfully Deleted",
+    htmlContent: `
+            <h2>Your Product with ID ${prodId} has successfully deleted</h2>
+          `,
+  });
+};
+
 exports.orderPlacedConfirmationMail = async (email, orderId) => {
   const receivers = [
     {
