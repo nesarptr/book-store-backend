@@ -1,7 +1,11 @@
+const path = require("path");
+const crypto = require("crypto");
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
+const multer = require("multer");
 
 const isAuthenticated = require("./middleware/is-auth");
 const authRoutes = require("./routes/auth");
@@ -11,6 +15,33 @@ const Throw = require("./utils/throw");
 
 const PORT = process.env.PORT || 8080;
 const app = express();
+
+const storage = multer.diskStorage({
+  destination: (_, _, cb) => {
+    cb(null, "images");
+  },
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      new Date().toISOString() +
+        crypto.randomBytes(32).toString("hex") +
+        "-" +
+        file.originalname
+    );
+  },
+});
+
+const fileFilter = (_, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
 
 app.use(helmet());
 // ! Handling CORS
@@ -25,6 +56,8 @@ app.use((_, res, next) => {
 });
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(multer({ storage, fileFilter }).single("image"));
+app.use("/images", express.static(path.join(__dirname, "images")));
 app.use(cookieParser());
 
 app.use("/api/v1/auth", authRoutes);
