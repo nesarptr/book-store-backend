@@ -14,7 +14,7 @@ router.post(
     .isString()
     .isLength({ min: 2 }),
   body("price", "price has to be a valid float number")
-    .isFloat()
+    .toFloat()
     .custom((price) => {
       if (price <= 0) {
         throw new Error("price has to be greater than zero");
@@ -43,7 +43,7 @@ router.put(
     .isString()
     .isLength({ min: 2 }),
   body("price", "price has to be a valid float number")
-    .isFloat()
+    .toFloat()
     .custom((price) => {
       if (price <= 0) {
         throw new Error("price has to be greater than zero");

@@ -26,9 +26,9 @@ exports.addNewProduct = async (req, res, next) => {
     const prodBody = { ...extractProductBody(body), imgURL: req.file.path };
     const product = new Product(prodBody);
     await product.save();
-    user.products.push(product._id);
+    user?.products.push(product._id);
     send.productCreatedConfirmationMail(email, product._id.toString());
-    await user.save();
+    await user?.save();
     res.status(201).json({
       message: "successfully product is created",
       data: product,
@@ -70,10 +70,15 @@ exports.editProduct = async (req, res, next) => {
 
     checkAuthorizedAndNotEmpty(product, userId);
 
+    // @ts-ignore
     product.name = body.name;
+    // @ts-ignore
     product.price = body.price;
+    // @ts-ignore
     product.imgURL = req.file ? req.file.path : product.imgURL;
+    // @ts-ignore
     product.description = body.description;
+    // @ts-ignore
     await product.save();
     res.status(200).json(product);
   } catch (error) {
@@ -87,9 +92,12 @@ exports.deleteProduct = async ({ params, userId, email }, res, next) => {
     const product = await Product.findById(prodId);
     checkAuthorizedAndNotEmpty(product, userId);
     const user = await User.findById(userId);
+    // @ts-ignore
     const deleteProduct = await product.remove();
     clearImage(deleteProduct.imgURL);
+    // @ts-ignore
     user.products = user.products.filter((p) => !p.equals(deleteProduct._id));
+    // @ts-ignore
     await user.save();
     send.productDeletedConfirmationMail(email, deleteProduct._id);
     res.status(200).json({

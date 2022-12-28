@@ -17,13 +17,13 @@ const PORT = process.env.PORT || 8080;
 const app = express();
 
 const storage = multer.diskStorage({
-  destination: (_, _, cb) => {
+  destination: (_, __, cb) => {
     cb(null, "images");
   },
-  filename: (req, file, cb) => {
+  filename: (_, file, cb) => {
     cb(
       null,
-      new Date().toISOString() +
+      new Date().toISOString().replace(/:/g, "-") +
         crypto.randomBytes(32).toString("hex") +
         "-" +
         file.originalname
@@ -43,6 +43,7 @@ const fileFilter = (_, file, cb) => {
   }
 };
 
+// @ts-ignore
 app.use(helmet());
 // ! Handling CORS
 app.use((_, res, next) => {
@@ -56,7 +57,18 @@ app.use((_, res, next) => {
 });
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-app.use(multer({ storage, fileFilter }).single("image"));
+app.use(
+  multer({
+    storage,
+    fileFilter,
+    limits: {
+      // @ts-ignore
+      limits: {
+        fileSize: 1024 * 1024 * 5,
+      },
+    },
+  }).single("image")
+);
 app.use("/images", express.static(path.join(__dirname, "images")));
 app.use(cookieParser());
 
