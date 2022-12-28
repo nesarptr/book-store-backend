@@ -23,10 +23,7 @@ const storage = multer.diskStorage({
   filename: (_, file, cb) => {
     cb(
       null,
-      new Date().toISOString().replace(/:/g, "-") +
-        crypto.randomBytes(32).toString("hex") +
-        "-" +
-        file.originalname
+      new Date().toISOString().replace(/:/g, "-") + "-" + file.originalname
     );
   },
 });
@@ -62,10 +59,7 @@ app.use(
     storage,
     fileFilter,
     limits: {
-      // @ts-ignore
-      limits: {
-        fileSize: 1024 * 1024 * 5,
-      },
+      fileSize: 1024 * 1024 * 5,
     },
   }).single("image")
 );

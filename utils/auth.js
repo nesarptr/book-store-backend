@@ -21,11 +21,13 @@ exports.handleLoginJWT = async (
         email,
       },
     },
+    // @ts-ignore
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: expACToken }
   );
   const newRefreshToken = jwt.sign(
     { userId: userId },
+    // @ts-ignore
     process.env.REFRESH_TOKEN_SECRET,
     { expiresIn: expRTToken }
   );
@@ -85,6 +87,7 @@ exports.handleRefreshToken = async (
   const user = await findByToken(refreshToken);
   // Detected refresh token reuse!
   if (!user) {
+    // @ts-ignore
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, handleHack);
 
     Throw.AuthorizationError(); //Forbidden
@@ -97,8 +100,10 @@ exports.handleRefreshToken = async (
 
   try {
     // evaluate jwt
+    // @ts-ignore
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 
+    // @ts-ignore
     if (!decoded || user._id.toString() !== decoded.userId.toString()) {
       Throw.AuthorizationError();
     }
@@ -110,11 +115,13 @@ exports.handleRefreshToken = async (
           email: user.email,
         },
       },
+      // @ts-ignore
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: expACToken }
     );
     const newRefreshToken = jwt.sign(
       { userId: user._id },
+      // @ts-ignore
       process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: expRTToken }
     );
