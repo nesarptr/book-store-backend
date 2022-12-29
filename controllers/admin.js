@@ -26,7 +26,7 @@ exports.addNewBook = async (req, res, next) => {
     const bookBody = { ...extractbookBody(body), imgURL: req.file.path };
     const book = new Book(bookBody);
     await book.save();
-    user?.books.push(book._id);
+    user.books.push(book._id);
     send.bookCreatedConfirmationMail(email, book._id.toString());
     await user?.save();
     res.status(201).json({
@@ -40,9 +40,7 @@ exports.addNewBook = async (req, res, next) => {
 
 exports.getAllBooks = async ({ userId }, res, next) => {
   try {
-    const books = (await Book.find({ owner: userId })).map(
-      (book) => book
-    );
+    const books = (await Book.find({ owner: userId })).map((book) => book);
     if (!books || books.length === 0) {
       Throw.NotFoundError("The user does not have any book");
     }
@@ -96,7 +94,7 @@ exports.deleteBook = async ({ params, userId, email }, res, next) => {
     const deleteBook = await book.remove();
     clearImage(deleteBook.imgURL);
     // @ts-ignore
-    user?.books = user?.books.filter((p) => !p.equals(deleteBook._id));
+    user.books = user?.books.filter((p) => !p.equals(deleteBook._id));
     // @ts-ignore
     await user.save();
     send.bookDeletedConfirmationMail(email, deleteBook._id);
