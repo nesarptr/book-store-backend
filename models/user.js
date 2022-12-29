@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose");
 
-const Product = require("./book");
+const Book = require("./book");
 
 const userSchema = new Schema({
   name: {
@@ -26,18 +26,18 @@ const userSchema = new Schema({
     required: true,
   },
   refreshTokens: [String],
-  products: [
+  books: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Product",
+      ref: "Book",
     },
   ],
   cart: {
     items: [
       {
-        productId: {
+        bookId: {
           type: Schema.Types.ObjectId,
-          ref: "Product",
+          ref: "Book",
           required: true,
         },
         quantity: { type: Number, required: true, min: 1 },
@@ -53,7 +53,7 @@ const userSchema = new Schema({
 });
 
 userSchema.post("remove", async (user) => {
-  await Product.deleteMany({ _id: { $in: user.products } });
+  await Book.deleteMany({ _id: { $in: user.books } });
 });
 
 module.exports = model("User", userSchema);

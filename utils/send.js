@@ -47,7 +47,7 @@ exports.confirmationMail = async (email) => {
   });
 };
 
-exports.productCreatedConfirmationMail = async (email, prodId) => {
+exports.bookCreatedConfirmationMail = async (email, bookId) => {
   const receivers = [
     {
       email,
@@ -56,14 +56,14 @@ exports.productCreatedConfirmationMail = async (email, prodId) => {
   await tranEmailApi.sendTransacEmail({
     sender,
     to: receivers,
-    subject: "Product Successfully Created",
+    subject: "Book Successfully Created",
     htmlContent: `
-            <h2>Your Product with ID ${prodId} has successfully created</h2>
+            <h2>Your Book with ID ${bookId} has successfully created</h2>
           `,
   });
 };
 
-exports.productDeletedConfirmationMail = async (email, prodId) => {
+exports.bookDeletedConfirmationMail = async (email, bookId) => {
   const receivers = [
     {
       email,
@@ -72,9 +72,9 @@ exports.productDeletedConfirmationMail = async (email, prodId) => {
   await tranEmailApi.sendTransacEmail({
     sender,
     to: receivers,
-    subject: "Product Successfully Deleted",
+    subject: "Book Successfully Deleted",
     htmlContent: `
-            <h2>Your Product with ID ${prodId} has successfully deleted</h2>
+            <h2>Your Book with ID ${bookId} has successfully deleted</h2>
           `,
   });
 };

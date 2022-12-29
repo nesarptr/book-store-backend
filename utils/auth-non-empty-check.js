@@ -1,15 +1,14 @@
 const Throw = require("./throw");
 
-exports.checkAuthorizedAndNotEmpty = (product, id) => {
-  this.checkNotEmpty(product);
-  this.checkAuth(product, id);
+exports.checkAuthorizedAndNotEmpty = (book, id) => {
+  this.checkNotEmpty(book);
+  this.checkAuth(book, id);
 };
 
-exports.checkNotEmpty = (product) => {
-  !product && Throw.NotFoundError("Could not find product.");
+exports.checkNotEmpty = (book) => {
+  !book && Throw.NotFoundError("Could not find book.");
 };
 
-exports.checkAuth = (product, id) => {
-  product.owner.toString() !== id &&
-    Throw.AuthorizationError("Not Authorized!");
+exports.checkAuth = (book, id) => {
+  book.owner.toString() !== id && Throw.AuthorizationError("Not Authorized!");
 };

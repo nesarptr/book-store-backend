@@ -47,13 +47,19 @@ exports.varifyMail = async ({ params }, res, next) => {
     if (!user) {
       Throw.AuthenticationError("Invalid Token");
     }
+    // @ts-ignore
     user.varified = true;
+    // @ts-ignore
     user.varifyToken = "";
+    // @ts-ignore
     user.varifyTokenExpiration = null;
+    // @ts-ignore
     await user.save();
+    // @ts-ignore
     send.confirmationMail(user.email);
     res.status(200).json({
       message: "email successfully varified",
+      // @ts-ignore
       userId: user._id,
     });
   } catch (error) {
@@ -75,12 +81,15 @@ exports.login = async (req, res, next) => {
     if (!user) {
       Throw.AuthenticationError("Email or Password is incorrect");
     }
+    // @ts-ignore
     const doMatch = await bcrypt.compare(body.password, user.password);
     if (!doMatch) {
       Throw.AuthenticationError("Email or Password is incorrect");
     }
+    // @ts-ignore
     if (!user.varified) {
       if (url) {
+        // @ts-ignore
         send.varificationMail(email, url, user.varifyToken);
       }
       Throw.AuthenticationError("User did not Verify his/her email");
@@ -88,8 +97,11 @@ exports.login = async (req, res, next) => {
 
     const { newTokens, accessToken } = await handleLoginJWT(
       cookies,
+      // @ts-ignore
       user._id,
+      // @ts-ignore
       user.email,
+      // @ts-ignore
       user.refreshTokens,
       60 * 15,
       60 * 60,
@@ -100,11 +112,14 @@ exports.login = async (req, res, next) => {
       }
     );
 
+    // @ts-ignore
     user.refreshTokens = newTokens;
+    // @ts-ignore
     await user.save();
     res.status(201).json({
       message: "User Successfully Loged In",
       data: {
+        // @ts-ignore
         userId: user._id,
         accessToken,
       },
@@ -134,7 +149,9 @@ exports.refresh = async (req, res, next) => {
         const hackedUser = await User.findOne({
           _id: decoded.UserInfo.userId,
         }).exec();
+        // @ts-ignore
         hackedUser.refreshTokens = [];
+        // @ts-ignore
         await hackedUser.save();
       }
     );

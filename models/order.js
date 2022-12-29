@@ -1,10 +1,10 @@
 const { Schema, model } = require("mongoose");
 
 const orderSchema = new Schema({
-  products: {
+  books: {
     type: [
       {
-        product: { type: Object, required: true },
+        book: { type: Object, required: true },
         quantity: { type: Number, required: true },
       },
     ],

@@ -5,7 +5,7 @@ const { body } = require("express-validator");
 const adminController = require("../controllers/admin");
 
 router.post(
-  "/product",
+  "/book",
   body(
     "name",
     "name has to be a non-empty valid String at least 2 character long"
@@ -28,13 +28,13 @@ router.post(
     .trim()
     .isString()
     .isLength({ min: 5, max: 400 }),
-  adminController.addNewProduct
+  adminController.addNewBook
 );
 
-router.get("/products", adminController.getAllProducts);
+router.get("/books", adminController.getAllBooks);
 
 router.put(
-  "/product/:id",
+  "/book/:id",
   body(
     "name",
     "name has to be a non-empty valid String at least 2 character long"
@@ -57,9 +57,9 @@ router.put(
     .trim()
     .isString()
     .isLength({ min: 5, max: 400 }),
-  adminController.editProduct
+  adminController.editBook
 );
 
-router.delete("/product/:id", adminController.deleteProduct);
+router.delete("/book/:id", adminController.deleteBook);
 
 module.exports = router;

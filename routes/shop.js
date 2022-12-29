@@ -2,13 +2,13 @@ const router = require("express").Router();
 
 const shopController = require("../controllers/shop");
 
-router.get("/products", shopController.getAllProducts);
+router.get("/books", shopController.getAllBooks);
 
-router.get("/product/:id", shopController.getSingleProduct);
+router.get("/book/:id", shopController.getSingleBook);
 
-router.put("/product/:id", shopController.addToCart);
+router.put("/book/:id", shopController.addToCart);
 
-router.delete("/product/:id", shopController.removeFromCart);
+router.delete("/book/:id", shopController.removeFromCart);
 
 router.post("/order", shopController.addOrder);
 

@@ -5,12 +5,12 @@ const { validationResult } = require("express-validator");
 
 const Throw = require("../utils/throw");
 const User = require("../models/user");
-const Product = require("../models/product");
+const Book = require("../models/book");
 const { checkAuthorizedAndNotEmpty } = require("../utils/auth-non-empty-check");
-const { productBody: extractProductBody } = require("../utils/extract");
+const { bookBody: extractbookBody } = require("../utils/extract");
 const send = require("../utils/send");
 
-exports.addNewProduct = async (req, res, next) => {
+exports.addNewBook = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -23,39 +23,39 @@ exports.addNewProduct = async (req, res, next) => {
       Throw.ValidationError("No File Picked");
     }
     const user = await User.findById(body.userId);
-    const prodBody = { ...extractProductBody(body), imgURL: req.file.path };
-    const product = new Product(prodBody);
-    await product.save();
-    user?.products.push(product._id);
-    send.productCreatedConfirmationMail(email, product._id.toString());
+    const bookBody = { ...extractbookBody(body), imgURL: req.file.path };
+    const book = new Book(bookBody);
+    await book.save();
+    user?.books.push(book._id);
+    send.bookCreatedConfirmationMail(email, book._id.toString());
     await user?.save();
     res.status(201).json({
-      message: "successfully product is created",
-      data: product,
+      message: "successfully book is created",
+      data: book,
     });
   } catch (error) {
     next(error);
   }
 };
 
-exports.getAllProducts = async ({ userId }, res, next) => {
+exports.getAllBooks = async ({ userId }, res, next) => {
   try {
-    const products = (await Product.find({ owner: userId })).map(
-      (product) => product
+    const books = (await Book.find({ owner: userId })).map(
+      (book) => book
     );
-    if (!products || products.length === 0) {
-      Throw.NotFoundError("The user does not have any product");
+    if (!books || books.length === 0) {
+      Throw.NotFoundError("The user does not have any book");
     }
     res.status(200).json({
       message: "all data successfully retrived",
-      data: products,
+      data: books,
     });
   } catch (error) {
     next(error);
   }
 };
 
-exports.editProduct = async (req, res, next) => {
+exports.editBook = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -65,44 +65,44 @@ exports.editProduct = async (req, res, next) => {
     const body = req.body;
     const userId = req.userId;
     body.userId = userId;
-    const prodId = params.id;
-    const product = await Product.findById(prodId);
+    const bookId = params.id;
+    const book = await Book.findById(bookId);
 
-    checkAuthorizedAndNotEmpty(product, userId);
+    checkAuthorizedAndNotEmpty(book, userId);
 
     // @ts-ignore
-    product.name = body.name;
+    book.name = body.name;
     // @ts-ignore
-    product.price = body.price;
+    book.price = body.price;
     // @ts-ignore
-    product.imgURL = req.file ? req.file.path : product.imgURL;
+    book.imgURL = req.file ? req.file.path : book.imgURL;
     // @ts-ignore
-    product.description = body.description;
+    book.description = body.description;
     // @ts-ignore
-    await product.save();
-    res.status(200).json(product);
+    await book.save();
+    res.status(200).json(book);
   } catch (error) {
     next(error);
   }
 };
 
-exports.deleteProduct = async ({ params, userId, email }, res, next) => {
+exports.deleteBook = async ({ params, userId, email }, res, next) => {
   try {
-    const prodId = params.id;
-    const product = await Product.findById(prodId);
-    checkAuthorizedAndNotEmpty(product, userId);
+    const bookId = params.id;
+    const book = await Book.findById(bookId);
+    checkAuthorizedAndNotEmpty(book, userId);
     const user = await User.findById(userId);
     // @ts-ignore
-    const deleteProduct = await product.remove();
-    clearImage(deleteProduct.imgURL);
+    const deleteBook = await book.remove();
+    clearImage(deleteBook.imgURL);
     // @ts-ignore
-    user.products = user.products.filter((p) => !p.equals(deleteProduct._id));
+    user?.books = user?.books.filter((p) => !p.equals(deleteBook._id));
     // @ts-ignore
     await user.save();
-    send.productDeletedConfirmationMail(email, deleteProduct._id);
+    send.bookDeletedConfirmationMail(email, deleteBook._id);
     res.status(200).json({
       message: "Delete Operation Successfull",
-      deleteData: deleteProduct,
+      deleteData: deleteBook,
     });
   } catch (error) {
     next(error);
