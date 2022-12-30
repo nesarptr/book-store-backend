@@ -7,6 +7,10 @@ const Throw = require("../utils/throw");
 const extract = require("../utils/extract");
 const User = require("../models/user");
 
+const JWTEXP = 60 * 60 * 3;
+const REFRESHTEXP = 60 * 60 * 6;
+const COOKIEAGE = 24 * 60 * 60 * 1000;
+
 exports.signup = async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -103,9 +107,9 @@ exports.login = async (req, res, next) => {
       user.email,
       // @ts-ignore
       user.refreshTokens,
-      60 * 15,
-      60 * 60,
-      24 * 60 * 60 * 1000,
+      JWTEXP,
+      REFRESHTEXP,
+      COOKIEAGE,
       res,
       async (rt) => {
         return await User.findOne({ refreshTokens: rt }).exec();
@@ -134,9 +138,9 @@ exports.refresh = async (req, res, next) => {
   try {
     const accessToken = await handleRefreshToken(
       cookies,
-      60 * 15,
-      60 * 60,
-      24 * 60 * 60 * 1000,
+      JWTEXP,
+      REFRESHTEXP,
+      COOKIEAGE,
       res,
       async (token) => {
         return await User.findOne({ refreshTokens: token });
