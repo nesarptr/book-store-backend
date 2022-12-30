@@ -14,6 +14,6 @@ module.exports = (req, _, next) => {
     req.email = decoded.UserInfo.email;
     next();
   } catch {
-    Throw.AuthorizationError("invalid token"); //invalid token
+    Throw.AuthenticationError("invalid token"); //invalid token
   }
 };

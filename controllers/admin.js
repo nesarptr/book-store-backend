@@ -26,6 +26,7 @@ exports.addNewBook = async (req, res, next) => {
     const bookBody = { ...extractbookBody(body), imgURL: req.file.path };
     const book = new Book(bookBody);
     await book.save();
+    // @ts-ignore
     user.books.push(book._id);
     send.bookCreatedConfirmationMail(email, book._id.toString());
     await user?.save();
