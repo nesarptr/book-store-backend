@@ -74,7 +74,12 @@ exports.editBook = async (req, res, next) => {
     // @ts-ignore
     book.price = body.price;
     // @ts-ignore
-    book.imgURL = req.file ? req.file.path : book.imgURL;
+    if (req.file) {
+      // @ts-ignore
+      clearImage(book.imgURL);
+      // @ts-ignore
+      book.imgURL = req.file.path;
+    }
     // @ts-ignore
     book.description = body.description;
     // @ts-ignore
