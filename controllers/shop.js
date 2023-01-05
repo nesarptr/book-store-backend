@@ -132,3 +132,22 @@ exports.addOrder = async ({ userId }, res, next) => {
     next(error);
   }
 };
+
+exports.order = async (req, res, next) => {
+  try {
+    const orders = (await Order.find({ "user.userId": req.userId })).map(
+      (o) => {
+        return {
+          books: o.books,
+          price: o.price,
+        };
+      }
+    );
+    res.status(200).json({
+      message: "orders are successfully retrived",
+      data: orders,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

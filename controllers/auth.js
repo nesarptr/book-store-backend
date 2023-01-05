@@ -18,7 +18,7 @@ exports.signup = async (req, res, next) => {
       Throw.ValidationError(errors.array()[0].msg);
     }
     const body = req.body;
-    const url = body.url || req;
+    const url = body.url || "";
     let user = await User.findOne({ email: body.email });
     if (user) {
       Throw.BadRequestError(
