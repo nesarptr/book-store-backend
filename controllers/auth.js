@@ -79,7 +79,7 @@ exports.login = async (req, res, next) => {
     }
     const body = req.body;
     const cookies = req.cookies;
-    const url = body.url;
+    const url = body.url || "";
     const email = body.email;
     const user = await User.findOne({ email });
     if (!user) {
