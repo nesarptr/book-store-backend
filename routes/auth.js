@@ -46,9 +46,13 @@ router.put("/refresh", authController.refresh);
 
 router.delete("/logout", authController.logout);
 
-router.get("/isAuth", isAuth, (_, res) => {
+router.get("/isAuth", isAuth, (req, res) => {
   res.status(200).json({
     message: "valid token",
+    // @ts-ignore
+    userId: req.userId,
+    // @ts-ignore
+    email: req.email,
   });
 });
 
