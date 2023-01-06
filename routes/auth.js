@@ -47,7 +47,9 @@ router.put("/refresh", authController.refresh);
 router.delete("/logout", authController.logout);
 
 router.get("/isAuth", isAuth, (_, res) => {
-  res.sendStatus(200);
+  res.status(200).json({
+    message: "valid token",
+  });
 });
 
 module.exports = router;
