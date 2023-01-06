@@ -60,7 +60,7 @@ exports.handleLoginJWT = async (
 
   res.cookie("jwt", newRefreshToken, {
     httpOnly: true,
-    secure: false,
+    secure: true,
     sameSite: "None",
     maxAge: cookieAge,
   });
