@@ -9,7 +9,6 @@ module.exports = (req, _, next) => {
   try {
     // @ts-ignore
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    console.log(req.userId, decoded.userId);
     req.userId = decoded.UserInfo.userId;
     req.email = decoded.UserInfo.email;
     next();
