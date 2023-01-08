@@ -99,6 +99,15 @@ exports.removeFromCart = async ({ params, userId }, res, next) => {
   }
 };
 
+exports.getCart = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.userId);
+    res.status(200).json(user?.cart);
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.addOrder = async ({ userId }, res, next) => {
   try {
     const user = await User.findById(userId).populate("cart.items.bookId");

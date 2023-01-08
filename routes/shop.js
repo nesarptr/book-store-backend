@@ -10,6 +10,8 @@ router.put("/book/:id", shopController.addToCart);
 
 router.delete("/book/:id", shopController.removeFromCart);
 
+router.get("/cart", shopController.getCart);
+
 router.get("/order", shopController.order);
 
 router.post("/order", shopController.addOrder);
