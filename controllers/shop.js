@@ -101,8 +101,11 @@ exports.removeFromCart = async ({ params, userId }, res, next) => {
 
 exports.getCart = async (req, res, next) => {
   try {
-    const user = await User.findById(req.userId);
-    res.status(200).json(user?.cart);
+    const user = await User.findById(req.userId).populate("cart.items.bookId");
+    const books = user?.cart?.items.map((p) => {
+      return { book: p.bookId, quantity: p.quantity };
+    });
+    res.status(200).json(books);
   } catch (error) {
     next(error);
   }
