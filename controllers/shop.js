@@ -1,3 +1,5 @@
+const { validationResult } = require("express-validator");
+
 const Order = require("../models/order");
 const User = require("../models/user");
 const Book = require("../models/book");
@@ -94,6 +96,40 @@ exports.removeFromCart = async ({ params, userId }, res, next) => {
       // @ts-ignore
       data: user.cart,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @ts-ignore
+exports.postCart = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      Throw.ValidationError(errors.array()[0].msg);
+    }
+    const user = await User.findById(req?.userId);
+    const items = req?.body?.cart;
+    // @ts-ignore
+    const total = items.length
+      ? items.reduce(async (acc, cur) => {
+          const book = await Book.findById(cur.bookId);
+          if (!book) {
+            Throw.ValidationError("Book Id is not Correct");
+          }
+          // @ts-ignore
+          return cur.quantity * book?.price + acc;
+        }, 0)
+      : 0;
+
+    // @ts-ignore
+    user.cart.items = items;
+    // @ts-ignore
+    user.cart.totalPrice = total;
+
+    await user?.save();
+
+    res.status(201).json({ cart: user?.cart });
   } catch (error) {
     next(error);
   }
