@@ -111,16 +111,13 @@ exports.postCart = async (req, res, next) => {
     const user = await User.findById(req?.userId);
     const items = req?.body?.cart;
     // @ts-ignore
-    const total = items.length
-      ? items.reduce(async (acc, cur) => {
-          const book = await Book.findById(cur.bookId);
-          if (!book) {
-            Throw.ValidationError("Book Id is not Correct");
-          }
-          // @ts-ignore
-          return cur.quantity * book?.price + acc;
-        }, 0)
-      : 0;
+    let total = 0;
+
+    for (const item of items) {
+      const book = await Book.findById(item.bookId);
+      // @ts-ignore
+      total += item.quantity * book?.price;
+    }
 
     // @ts-ignore
     user.cart.items = items;
