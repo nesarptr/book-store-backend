@@ -68,7 +68,9 @@ app.use("/images", express.static(path.join(__dirname, "images")));
 app.use(cookieParser());
 
 app.use("/api/v1/auth", authRoutes);
-
+app.get("/api/v1/stp-key", (_, res, __) =>
+  res.status(200).json({ key: process.env.STRIPE_PUBLISHABLE_KEY })
+);
 app.use("/api/v1/admin", isAuthenticated, adminRoutes);
 app.use("/api/v1/shop", isAuthenticated, shopRoutes);
 
