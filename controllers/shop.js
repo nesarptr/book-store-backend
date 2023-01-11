@@ -152,21 +152,27 @@ exports.getCart = async (req, res, next) => {
 };
 
 // @ts-ignore
-// @ts-ignore
 exports.addOrder = async ({ userId }, res, next) => {
   try {
-    const user = await User.findById(userId).populate("cart.items.bookId");
+    const user = await User.findById(userId);
     // @ts-ignore
     if (user.cart.items.length === 0 || user.cart.totalPrice <= 0) {
       Throw.BadRequestError("User cart is empty");
     }
 
     // @ts-ignore
-    const books = user.cart.items.map((p) => {
-      return { book: p.bookId, quantity: p.quantity };
-    });
+    const books = [];
+    // @ts-ignore
+    for (const { bookId, quantity } of user.cart.items) {
+      const book = await Book.findById(bookId);
+      books.push({
+        book,
+        quantity,
+      });
+    }
+    console.log(books);
     const order = new Order({
-      books: books,
+      books,
       // @ts-ignore
       price: user.cart.totalPrice,
       user: {
