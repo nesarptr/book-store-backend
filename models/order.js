@@ -11,6 +11,12 @@ const orderSchema = new Schema({
     required: true,
   },
   price: Number,
+  isPaid: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  secret: String,
   user: {
     email: {
       type: String,

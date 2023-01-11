@@ -1,4 +1,10 @@
 const { validationResult } = require("express-validator");
+// @ts-ignore
+const { v4: uuidv4 } = require("uuid");
+// @ts-ignore
+const stripe = require("stripe")(process.env.STRIPE_KEY, {
+  apiVersion: "2022-11-15",
+});
 
 const Order = require("../models/order");
 const User = require("../models/user");
@@ -144,13 +150,15 @@ exports.getCart = async (req, res, next) => {
   }
 };
 
-exports.addOrder = async ({ userId }, res, next) => {
+// @ts-ignore
+exports.addOrder = async ({ userId, email }, res, next) => {
   try {
     const user = await User.findById(userId).populate("cart.items.bookId");
     // @ts-ignore
     if (user.cart.items.length === 0 || user.cart.totalPrice <= 0) {
       Throw.BadRequestError("User cart is empty");
     }
+
     // @ts-ignore
     const books = user.cart.items.map((p) => {
       return { book: p.bookId, quantity: p.quantity };
@@ -183,6 +191,7 @@ exports.order = async (req, res, next) => {
     const orders = (await Order.find({ "user.userId": req.userId })).map(
       (o) => {
         return {
+          _id: o._id,
           books: o.books,
           price: o.price,
         };
@@ -191,6 +200,57 @@ exports.order = async (req, res, next) => {
     res.status(200).json({
       message: "orders are successfully retrived",
       data: orders,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.pay = async (req, res, next) => {
+  try {
+    const orderId = req.params.id;
+    const order = await Order.findById(orderId);
+    if (!order) {
+      Throw.ValidationError("invalid order");
+    }
+    if (order?.isPaid) {
+      Throw.ValidationError("the amount for this order is already paid");
+    }
+
+    const paymentIntent = await stripe.charges.create({
+      // @ts-ignore
+      amount: order?.price * 100, // 25
+      currency: "usd",
+      automatic_payment_methods: { enabled: true },
+    });
+
+    // @ts-ignore
+    order.secret = paymentIntent.client_secret;
+
+    await order?.save();
+
+    res.status(200).json({
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @ts-ignore
+exports.confirmPay = async (req, res, next) => {
+  try {
+    const secret = req.params.secret;
+    const order = await Order.findOne({ secret });
+    if (!order) {
+      Throw.ValidationError("invalid secret");
+    }
+    // @ts-ignore
+    (order.isPaid = true), (order.secret = ""), await order?.save();
+
+    send.paymentSuccessEmail(req.email, order?._id);
+    res.status(200).json({
+      message: "Payment successful",
     });
   } catch (error) {
     next(error);

@@ -14,7 +14,6 @@ const bookSchema = new Schema({
   imgURL: {
     type: String,
     required: true,
-    trim: true,
   },
   description: String,
   owner: {
