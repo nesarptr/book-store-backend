@@ -191,15 +191,16 @@ exports.order = async (req, res, next) => {
     const orders = (await Order.find({ "user.userId": req.userId })).map(
       (o) => {
         return {
-          _id: o._id,
+          id: o._id,
           books: o.books,
           price: o.price,
+          status: o.isPaid,
         };
       }
     );
     res.status(200).json({
       message: "orders are successfully retrived",
-      data: orders,
+      orders,
     });
   } catch (error) {
     next(error);
