@@ -170,7 +170,6 @@ exports.addOrder = async ({ userId }, res, next) => {
         quantity,
       });
     }
-    console.log(books);
     const order = new Order({
       books,
       // @ts-ignore
