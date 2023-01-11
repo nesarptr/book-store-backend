@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
 // @ts-ignore
+// @ts-ignore
 const { v4: uuidv4 } = require("uuid");
 // @ts-ignore
 const stripe = require("stripe")(process.env.STRIPE_KEY, {
@@ -151,7 +152,8 @@ exports.getCart = async (req, res, next) => {
 };
 
 // @ts-ignore
-exports.addOrder = async ({ userId, email }, res, next) => {
+// @ts-ignore
+exports.addOrder = async ({ userId }, res, next) => {
   try {
     const user = await User.findById(userId).populate("cart.items.bookId");
     // @ts-ignore
@@ -175,6 +177,12 @@ exports.addOrder = async ({ userId, email }, res, next) => {
       },
     });
     await order.save();
+    // @ts-ignore
+    user.cart.items = [];
+    // @ts-ignore
+    user.cart.totalPrice = 0;
+
+    await user?.save();
     // @ts-ignore
     send.orderPlacedConfirmationMail(user.email, order._id.toString());
     res.status(200).json({
