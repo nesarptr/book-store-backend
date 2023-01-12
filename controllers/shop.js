@@ -236,6 +236,7 @@ exports.pay = async (req, res, next) => {
       amount: order?.price * 100, // 25
       currency: "usd",
       automatic_payment_methods: { enabled: true },
+      receipt_email: req.email,
     });
 
     // @ts-ignore
