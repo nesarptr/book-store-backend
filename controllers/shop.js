@@ -231,7 +231,7 @@ exports.pay = async (req, res, next) => {
       Throw.ValidationError("the amount for this order is already paid");
     }
 
-    const paymentIntent = await stripe.charges.create({
+    const paymentIntent = await stripe.paymentIntents.create({
       // @ts-ignore
       amount: order?.price * 100, // 25
       currency: "usd",
