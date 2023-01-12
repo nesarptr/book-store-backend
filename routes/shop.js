@@ -25,6 +25,6 @@ router.post("/order", shopController.addOrder);
 
 router.post("/pay/:id", shopController.pay);
 
-router.put("/pay/:secret", shopController.confirmPay);
+router.put("/pay/:id", shopController.confirmPay);
 
 module.exports = router;

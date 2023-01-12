@@ -231,18 +231,24 @@ exports.pay = async (req, res, next) => {
       Throw.ValidationError("the amount for this order is already paid");
     }
 
-    const paymentIntent = await stripe.paymentIntents.create({
+    let paymentIntent;
+
+    if (order?.paymentId) {
+      paymentIntent = await stripe.paymentIntents.retrieve(order.paymentId);
+    } else {
+      paymentIntent = await stripe.paymentIntents.create({
+        // @ts-ignore
+        amount: order?.price * 100, // 25
+        currency: "usd",
+        automatic_payment_methods: { enabled: true },
+        receipt_email: req.email,
+      });
+
       // @ts-ignore
-      amount: order?.price * 100, // 25
-      currency: "usd",
-      automatic_payment_methods: { enabled: true },
-      receipt_email: req.email,
-    });
+      order.paymentId = paymentIntent.id;
 
-    // @ts-ignore
-    order.secret = paymentIntent.client_secret;
-
-    await order?.save();
+      await order?.save();
+    }
 
     res.status(200).json({
       clientSecret: paymentIntent.client_secret,
@@ -255,15 +261,23 @@ exports.pay = async (req, res, next) => {
 // @ts-ignore
 exports.confirmPay = async (req, res, next) => {
   try {
-    const secret = req.params.secret;
-    const order = await Order.findOne({ secret });
+    const paymentId = req.params.id;
+    const order = await Order.findOne({ paymentId });
     if (!order) {
-      Throw.ValidationError("invalid secret");
+      Throw.ValidationError("invalid id");
     }
-    // @ts-ignore
-    (order.isPaid = true), (order.secret = ""), await order?.save();
 
-    send.paymentSuccessEmail(req.email, order?._id);
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentId);
+    console.log("intent: ", paymentIntent);
+    paymentIntent && console.log(paymentIntent?.status);
+
+    if (paymentIntent.status !== "succeeded") {
+      Throw.BadRequestError("user did not pay the amount")
+    }
+      // @ts-ignore
+      (order.isPaid = true), (order?.paymentId = ""), await order?.save();
+
+      send.paymentSuccessEmail(req.email, order?._id);
     res.status(200).json({
       message: "Payment successful",
     });

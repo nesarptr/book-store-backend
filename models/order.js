@@ -16,7 +16,7 @@ const orderSchema = new Schema({
     required: true,
     default: false,
   },
-  secret: String,
+  paymentId: String,
   user: {
     email: {
       type: String,
