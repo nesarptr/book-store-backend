@@ -272,12 +272,12 @@ exports.confirmPay = async (req, res, next) => {
     paymentIntent && console.log(paymentIntent?.status);
 
     if (paymentIntent.status !== "succeeded") {
-      Throw.BadRequestError("user did not pay the amount")
+      Throw.BadRequestError("user did not pay the amount");
     }
-      // @ts-ignore
-      (order.isPaid = true), (order?.paymentId = ""), await order?.save();
+    // @ts-ignore
+    (order.isPaid = true), (order.paymentId = ""), await order?.save();
 
-      send.paymentSuccessEmail(req.email, order?._id);
+    send.paymentSuccessEmail(req.email, order?._id);
     res.status(200).json({
       message: "Payment successful",
     });
