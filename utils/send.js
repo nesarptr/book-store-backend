@@ -95,7 +95,7 @@ exports.orderPlacedConfirmationMail = async (email, orderId) => {
   });
 };
 
-exports.paymentSuccessEmail = async (email, orderId) => {
+exports.paymentSuccessEmail = async (email, amount, orderId, paymentId) => {
   const receivers = [
     {
       email,
@@ -104,9 +104,10 @@ exports.paymentSuccessEmail = async (email, orderId) => {
   await tranEmailApi.sendTransacEmail({
     sender,
     to: receivers,
-    subject: "Order Successfully Palced",
+    subject: "payment successful",
     htmlContent: `
-            <h2>You have paid successfully paid for Order Id ${orderId}</h2>
+            <h2>You have paid ${amount} successfully for Order Id ${orderId}</h2>
+            <h2>your payment id is ${paymentId}</h2>
           `,
   });
 };

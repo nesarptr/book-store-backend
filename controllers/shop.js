@@ -268,8 +268,6 @@ exports.confirmPay = async (req, res, next) => {
     }
 
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentId);
-    console.log("intent: ", paymentIntent);
-    paymentIntent && console.log(paymentIntent?.status);
 
     if (paymentIntent.status !== "succeeded") {
       Throw.BadRequestError("user did not pay the amount");
@@ -277,7 +275,7 @@ exports.confirmPay = async (req, res, next) => {
     // @ts-ignore
     (order.isPaid = true), (order.paymentId = ""), await order?.save();
 
-    send.paymentSuccessEmail(req.email, order?._id);
+    send.paymentSuccessEmail(req.email, order?.price, order?._id, paymentId);
     res.status(200).json({
       message: "Payment successful",
     });
