@@ -43,16 +43,12 @@ const fileFilter = (_, file, cb) => {
 // @ts-ignore
 app.use(helmet());
 // ! Handling CORS
-app.use(cors());
-// app.use((_, res, next) => {
-//   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000/");
-//   res.setHeader(
-//     "Access-Control-Allow-Methods",
-//     "OPTIONS, GET, POST, PUT, PATCH, DELETE"
-//   );
-//   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-//   next();
-// });
+app.use(
+  cors({
+    origin: "https://book-store-frontend-nu.vercel.app/",
+    credentials: true,
+  })
+);
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(
