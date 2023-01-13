@@ -45,7 +45,7 @@ app.use(helmet());
 // ! Handling CORS
 app.use(
   cors({
-    origin: "https://book-store-frontend-nu.vercel.app",
+    origin: "https://my-book-store.vercel.app",
     credentials: true,
   })
 );
