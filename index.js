@@ -47,7 +47,11 @@ app.use(
   cors({
     origin: "https://book-store-frontend-nu.vercel.app/",
     credentials: true,
-  })
+  }),
+  (req, res, next) => {
+    console.log(req.headers);
+    next();
+  }
 );
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
