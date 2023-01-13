@@ -7,8 +7,8 @@ const Throw = require("../utils/throw");
 const extract = require("../utils/extract");
 const User = require("../models/user");
 
-const JWTEXP = 60 * 60 * 3;
-const REFRESHTEXP = 60 * 60 * 6;
+const JWTEXP = 60 * 60 * 24;
+const REFRESHTEXP = 60 * 60 * 72;
 const COOKIEAGE = 24 * 60 * 60 * 1000;
 
 exports.signup = async (req, res, next) => {
