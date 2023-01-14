@@ -18,7 +18,7 @@ exports.signup = async (req, res, next) => {
       Throw.ValidationError(errors.array()[0].msg);
     }
     const body = req.body;
-    const url = body.url || "";
+    const url = body.url;
     let user = await User.findOne({ email: body.email });
     if (user) {
       Throw.BadRequestError(
@@ -26,8 +26,11 @@ exports.signup = async (req, res, next) => {
       );
     }
     user = new User(await extract.userBody(body));
+    if (!url) {
+      user.varified = true;
+    }
     await user.save();
-    send.varificationMail(user.email, url, user.varifyToken);
+    url && send.varificationMail(user.email, url, user.varifyToken);
     res.status(201).json({
       message: "user successfully signed up! Please varify the email",
       userId: user._id,
