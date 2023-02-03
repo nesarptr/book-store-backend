@@ -278,6 +278,7 @@ exports.confirmPay = async (req, res, next) => {
     send.paymentSuccessEmail(req.email, order?.price, order?._id, paymentId);
     res.status(200).json({
       message: "Payment successful",
+      id: order?._id.toString()
     });
   } catch (error) {
     next(error);
